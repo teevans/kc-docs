@@ -1,5 +1,5 @@
-User Management - SSO/SAML
-==========================
+User Management
+===============
 
 Kubecost’s SSO/SAML 2.0 support makes it easy to manage application access and works with top identity providers, incuding Okta, Auth0, AzureAD, PingID, and KeyCloak. Here are the high-level options for access supported:
 

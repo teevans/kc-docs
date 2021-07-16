@@ -3,6 +3,7 @@ Helm Parameters
 
 There are three different approaches for passing custom helm config values into the Kubecost project:  
 
+
 1. **pass exact parameters via `--set` command line flags.** For example, you can only pass a product key if that is all you need to configure.
 
 ```

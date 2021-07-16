@@ -2,6 +2,7 @@ Custom Prometheus
 =================
 
 
+
 Integrating Kubecost with an existing Prometheus installation can be nuanced. We recommend first installing Kubecost with a bundled Prometheus ([instructions](http://kubecost.com/install)) as a dry run before integrating with an external Prometheus deployment. We also recommend getting in touch (team@kubecost.com) for assistance.
 
 **Note:** integrating with an existing Prometheus is only officially supported under Kubecost paid plans.

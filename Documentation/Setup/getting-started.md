@@ -4,25 +4,25 @@ Getting Started
 Welcome to Kubecost! This page provides commonly used product configurations and feature overviews to help get you up and running after the Kubecost product has been [installed](http://kubecost.com/install).
 
 __Configuration__  
-[Configuring metric storage](#storage-config)  
-[Setting requests & limits](#requests-limits)  
-[Product configuration at install-time](#install-configs)  
-[Setting up a cloud integration](#cloud-integration)  
-[Using an existing Prometheus or Grafana installation](#custom-prom)  
-[Using an existing node exporter installation](#node-exporter)  
-[Exposing Kubecost with an Ingress](#basic-auth)  
-[Adding a spot instance configuration (AWS only)](#spot-nodes)  
-[Allocating out of cluster costs](#out-of-cluster)  
-[Refectling Reserved Instance or Committed Use Pricing](#ri-committed-discount)  
-[Deploying Kubecost without persistent volumes](#no-pvs)
+[Configuring metric storage](#storage-configuration)  
+[Setting requests & limits](#setting-requests-&-limits)  
+[Product configuration at install-time](#product-configuration-at-install-time ) 
+[Setting up a cloud integration](#setting-up-a-cloud-integration)  
+[Using an existing Prometheus or Grafana installation](#bring-your-own-prometheus-or-grafana)  
+[Using an existing node exporter installation](#using-an-existing-node-exporter)  
+[Exposing Kubecost with an Ingress](#kubecost-ingress-examples)  
+[Adding a spot instance configuration - AWS](#spot-instance-configuration---aws)  
+[Allocating out of cluster costs](#allocating-out-of-cluster-costs)  
+[Refectling Reserved Instance or Committed Use Pricing](#accurately-tracking-reserved-instance-or-committed-use-discountst)  
+[Deploying Kubecost without persistent volumes](#deploying-kubecost-without-persistent-volumes)
 
 __Next Steps__  
-[Measure cluster cost efficiency](#cluster-efficiency)  
+[Measure cluster cost efficiency](#measuring-cluster-cost-efficiency)  
 [Cost monitoring best practices](http://blog.kubecost.com/blog/cost-monitoring/)  
-[Understanding cost allocation metrics](/cost-allocation.md)  
-<br/><br/>
+[Understanding cost allocation metrics](https://kubecost.zendesk.com/hc/en-us/articles/4402882997527-Kubernetes-Cost-Allocation)  
 
-## <a name="storage-config"></a>Storage configuration
+
+## Storage configuration
 
 The default Kubecost installation comes with a 32Gb persistent volume and a 15-day retention period for Prometheus metrics. This is enough space to retain data for ~300 pods, depending on your exact node and container count. See the Kubecost Helm chart [configuration options](https://github.com/kubecost/cost-analyzer-helm-chart) to adjust both retention period and storage size.
 
@@ -36,17 +36,17 @@ Where ingested samples can be measured as the average over a recent period, e.g.
 
 **Note:** We do not recommend retaining greater than 30 days of data in Prometheus for larger clusters. For long-term data retention, contact us (team@kubecost.com) about Kubecost with durable storage enabled.
 
-[More info on Kubecost Storage](/storage.md)
+[More info on Kubecost Storage](/hc/en-us/articles/4402883011863-Cost-Analyzer-Persistent-Volume)
 
-## <a name="custom-prom"></a>Bring your own Prometheus or Grafana
+## Bring your own Prometheus or Grafana
 
 The Kubecost Prometheus deployment is used as both as a source and a sink for cost & capacity metrics. It's optimized to not interfere with other observability instrumentation and by default only contains metrics that are useful to the Kubecost product. This amounts to retaining 70-90% fewer metrics than a standard Prometheus deployment.
 
 For the best experience, we generally recommend teams use the bundled `prometheus-server` & `grafana` but reuse their existing `kube-state-metrics` and `node-exporter` deployments if they already exist. This setup allows for the easiest installation process, easiest on-going maintenance, minimal duplication of metrics, and more flexible metric retention.
 
-That being said, we do support using an existing Grafana & Prometheus installation in our paid products today. You can see basic setup instructions [here](/custom-prom.md). In our free product, we only provide best efforts support for this integration because of the nuances required in completing this integration successfully. Please contact us (team@kubecost.com) if you want to learn more or if you think we can help!
+That being said, we do support using an existing Grafana & Prometheus installation in our paid products today. You can see basic setup instructions [here](https://kubecost.zendesk.com/hc/en-us/articles/4402868633367-Custom-Prometheus). In our free product, we only provide best efforts support for this integration because of the nuances required in completing this integration successfully. Please contact us (team@kubecost.com) if you want to learn more or if you think we can help!
 
-## <a name="requests-limits"></a>Setting Requests & Limits
+## Setting Requests & Limits
 
 It's recommended that users set and/or update resource requests and limits before taking Kubecost into production at scale. These inputs can be configured in the Kubecost [values.yaml](https://github.com/kubecost/cost-analyzer-helm-chart/blob/master/cost-analyzer/values.yaml) for Kubecost modules + subcharts.
 
@@ -54,33 +54,33 @@ Exact recommended values for these parameters depend on the size of your cluster
 
 In practice, we recommend running Kubecost for up to 7 days on a production cluster and then tuning resource requests/limits based on resource consumption. Reach out any time to team@kubecost.com if we can help give further guidance.
 
-## <a name="install-configs"></a>Product configuration at install-time
+## Product configuration at install-time
 
 Kubecost has a number of product configuration options that you can specify at install time in order to minimize the number of settings changes required within product UI. This makes it simple to redeploy Kubecost. These values can be configured under `kubecostProductConfigs` in our [values.yaml](https://github.com/kubecost/cost-analyzer-helm-chart/blob/bb8bcb570e6c52db2ed603f69691ac8a47ff4a26/cost-analyzer/values.yaml#L335). These parameters are passed to a configmap that Kubecost detects and writes to its /var/configs.
 
-## <a name="cloud-integration"></a>Setting up a cloud integration
+## Setting up a cloud integration
 
 By default, Kubecost dynamically detects your cloud provider and pulls list prices on Azure, AWS, and GCP for all in-cluster assets. By completing a cloud integration with one of these providers, you get the ability to view Kubernetes cost metrics side-by-side with external cloud services cost, e.g. S3, BigQuery, Azure Database Services. Additionally, it allows Kubecost to reconcile spend with your actual cloud bill to reflect enterprise discounts, spot market prices, comittment discounts, and more. This gives teams running Kubernetes a complete and accurate picture of costs. 
 
-&nbsp;&nbsp;&nbsp;&nbsp;[Azure billing integration](/azure-out-of-cluster.md)  
-&nbsp;&nbsp;&nbsp;&nbsp;[AWS billing integration](/aws-out-of-cluster.md)  
-&nbsp;&nbsp;&nbsp;&nbsp;[GCP billing integration](/gcp-out-of-cluster.md)  
+[Azure billing integration](/hc/en-us/articles/4402868627479-Integrating-Azure-Out-of-Cluster-Cluster-Costs-into-Kubecost)  
+[AWS billing integration](/hc/en-us/articles/4402882988567-AWS-Out-of-Cluster-)  
+[GCP billing integration](/hc/en-us/articles/4402883005207-GCP-Out-of-Cluster)  
 
-## <a name="node-exporter"></a>Using an existing node exporter
+## Using an existing node exporter
 
 For teams already running node exporter on the default port, our bundled node exporter may remain in a `Pending` state. You can optionally use an existing node exporter DaemonSet by setting the `prometheus.nodeExporter.enabled` and `prometheus.serviceAccounts.nodeExporter.create` Kubecost helm chart config options to `false`. More configs options shown [here](https://github.com/kubecost/cost-analyzer-helm-chart). Note: this requires your existing node exporter endpoint to be visible from the namespace where Kubecost is installed.
 
-## <a name="basic-auth"></a>Kubecost Ingress examples
+## Kubecost Ingress examples
 
 Enabling external access to the Kubecost product simply requires exposing access to port 9090 on the `kubecost-cost-analyzer` pod. This can be accomplished with a number of approaches, including Ingress or Service definitions. View [example Ingress definitions](https://github.com/kubecost/docs/blob/master/ingress-examples.md) for a number of approaches for accomplishing this.  
 
 Also, the default [values.yaml](https://github.com/kubecost/cost-analyzer-helm-chart/blob/master/cost-analyzer/values.yaml) has a stock Ingress that can be used.
 
-## <a name="spot-nodes"></a>Spot Instance Configuration (AWS only)
+## Spot Instance Configuration - AWS 
 
 For more accurate Spot pricing data, visit Settings in the Kubecost frontend to configure a [data feed](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-data-feeds.html) for AWS Spot instances. This enables the Kubecost product to have actual Spot node prices vs user-provided estimates.
 
-![AWS Spot info](/spot-settings.png)
+![AWS Spot info](https://raw.githubusercontent.com/kubecost/docs/docs-kb/Documentation/images/spot-settings.png)
 
 **Necessary Steps**
 
@@ -120,21 +120,21 @@ I1104 00:21:02.922372       1 awsprovider.go:1376] Spot feed version is "#Ver
 
 The Charge figures in logs should be reflected in your `node_total_hourly_cost` metrics in Prometheus.
 
-## <a name="out-of-cluster"></a>Allocating out of cluster costs
+## Allocating out of cluster costs
 
-**[AWS]** Provide your configuration info in Settings. The information needs to include the S3 bucket name, the Athena table name, the Athena table region, and the Athena database name. View [this page](/aws-out-of-cluster.md) for more information on completing this process.
+**[AWS]** Provide your configuration info in Settings. The information needs to include the S3 bucket name, the Athena table name, the Athena table region, and the Athena database name. View [this page](https://kubecost.zendesk.com/hc/en-us/articles/4402882988567-AWS-Out-of-Cluster-) for more information on completing this process.
 
-**[GCP]** Provide configuration info by selecting "Add key" from the Cost Allocation Page. View [this page](/gcp-out-of-cluster.md) for more information on completing this process.
+**[GCP]** Provide configuration info by selecting "Add key" from the Cost Allocation Page. View [this page](https://kubecost.zendesk.com/hc/en-us/articles/4402883005207-GCP-Out-of-Cluster) for more information on completing this process.
 
-## <a name="ri-committed-discount"></a>Accurately tracking Reserved Instance or committed use discounts
+## Accurately tracking Reserved Instance or committed use discounts
 
 Paid versions of the Kubecost product reflect Reserved Instance (AWS), committed use (GCP), and custom-negotiated discounts into asset pricing. This allows for accurate allocation of costs to individual teams, apps, etc. Enabling this feature simply requires adding role access to cloud provider billing data and does not egress any data to external services. Contact us (team@kubecost.com) if you're interested in more information.
 
 #### AWS Reserved Instance Details:
-Accurately tracking AWS Reserved Instance prices requires access to an Athena table containing the Cost and Usage Report (CUR). Data for new RIs may be delayed until the instance data is available in the CUR. Once data is available, Kubecost will reflect the price shown in the [reservation/EffectiveCost]( http://docs.kubecost.com/getting-started#ri-committed-discount) field. Kubecost will also reconcile daily spend with cost figures available in the CUR. 
+Accurately tracking AWS Reserved Instance prices requires access to an Athena table containing the Cost and Usage Report (CUR). Data for new RIs may be delayed until the instance data is available in the CUR. Once data is available, Kubecost will reflect the price shown in the [reservation/EffectiveCost](#Accurately-tracking-Reserved-Instance-or-committed-use-discountst) field. Kubecost will also reconcile daily spend with cost figures available in the CUR. 
 
 
-## <a name="no-pvs"></a>Deploying Kubecost without persistent volumes
+## Deploying Kubecost without persistent volumes
 
 You may optionally pass the following Helm flags to install Kubecost and its bundled dependancies without any Persistent Volumes. Note any time the Prometheus server pod is restarted then all historical billing data will be lost, unless Thanos or other long-term storage is enabled in the Kubecost product.  
 
@@ -145,11 +145,11 @@ You may optionally pass the following Helm flags to install Kubecost and its bun
 --set persistentVolume.enabled=false 
 ```
 
-## <a name="cluster-efficiency"></a>Measuring cluster cost efficiency
+## Measuring cluster cost efficiency
 
 For teams interested in reducing their Kubernetes costs, we have seen it be beneficial to first understand how efficiently  provisioned resources have been used. This can be answered by measuring the cost of idle resources (e.g. compute, memory, etc)  as a percentage of your overall cluster spend. This figure represents the impact of many infrastructure and application-level decisions, i.e. machine type selection, bin packing efficiency, and more. The Kubecost product (Cluster Overview page) provides a view into this data for an initial assessment of resource efficiency and the cost of waste.
 
-<div style="text-align:center;"><img src="/cluster-efficiency.png" /></div>
+![cluster-efficiency](https://raw.githubusercontent.com/kubecost/docs/docs-kb/Documentation/images/cluster-efficiency.png)
 
 With an overall understanding of idle spend, you will have a better sense of where to focus efforts for efficiency gains. Each resource type can now be tuned for your business. Most teams we’ve seen end up targeting utilization in the following ranges:
 

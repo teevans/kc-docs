@@ -180,8 +180,8 @@ filterServices | | Comma-separated list of services to match; e.g. `frontend-one
 shareIdle | false | If `true`, idle cost is allocated proportionally across all non-idle allocations, per-resource. That is, idle CPU cost is shared with each non-idle allocation's CPU cost, according to the percentage of the total CPU cost represented.
 splitIdle | false | If `true`, and `shareIdle == false` Idle Allocations are created on a per cluster or per node basis rather than being aggregated into a single "\_idle\_" allocation.
 idleByNode | false | If `true`, idle allocations are created on a per node basis. Which will result in different values when shared and more idle allocations when split.
-reconcile | false | If `true` pulls data from the Assets cache and corrects prices of Allocations according to their related Assets. The corrections from this process are stored in each cost categories cost adjustment field. If the integration with you cloud provider's billing data has been set up, this will result in the most accurate costs for Allocations.
-shareOverhead | false | If `true`, share the cost of cluster overhead assets such as cluster management costs and node attached volumes across tenants of those resources. Results are added to the sharedCost field.
+reconcile | true | If `true` pulls data from the Assets cache and corrects prices of Allocations according to their related Assets. The corrections from this process are stored in each cost categories cost adjustment field. If the integration with you cloud provider's billing data has been set up, this will result in the most accurate costs for Allocations.
+shareTenancyCosts | true | If `true`, share the cost of cluster overhead assets such as cluster management costs and node attached volumes across tenants of those resources. Results are added to the sharedCost field.
 shareNamespaces | | Comma-separated list of namespaces to share; e.g. `kube-system, kubecost` will share the costs of those two namespaces with the remaining non-idle, unshared allocations.
 shareLabels | | Comma-separated list of labels to share; e.g. `env:staging, app:test` will share the costs of those two label values with the remaining non-idle, unshared allocations.
 shareCost | 0.0 | Floating-point value representing a monthly cost to share with the remaining non-idle, unshared allocations; e.g. `30.42` ($1.00/day == $30.42/month) for the query `yesterday` (1 day) will split and distribute exactly $1.00 across the allocations.
@@ -307,6 +307,18 @@ $ curl http://localhost:9090/model/allocation \
   ]
 }
 ```
+
+### Allocation of Asset Costs:
+
+Both the `reconcile` and `shareTenancyCosts` flags start query-time processes that distribute the costs of Assets to Allocations related to them. For the `reconcile` flag, these connections can be straightforward like the connection between a node Asset and an Allocation where the CPU, GPU and RAM usage can be used to distribute a proportion of the node's cost to the Allocations that run on it. For Assets and Allocations where the connection is less well-defined, such as network Assets we have opted for a method of distributing the cost that we call Distribution by Usage Hours.
+
+Distribution by Usage Hours takes the usage of the windows (start time and end time) of an Asset and all the Allocations connected to it and finds the number of hours that both the Allocation and Asset were running. The number of hours for each Allocation related to an Asset is called Alloc_Usage_Hours. The sum of all Alloc_Usage_Hours for a single Assets is Total_Usage_Hours. With these values an Assets cost is distributed to each connected Allocation using the formula Asset_Cost * Alloc_Usage_Hours/Total_Usage_Hours. Depending on the Asset type an Allocation can receive proportions of multiple Asset Costs.
+
+Asset types that use this distribution method include:
+- Network (`reconcile`): When the network pod is not enabled cost is distributed by usage hours. If the network pod is enabled cost is distributed to Allocations proportionally to usage. 
+- Load Balancer (`reconcile`)
+- Cluster Management (`shareTenancyCosts`)
+- Attached disks (`shareTenancyCosts`): Does not include PVs, which are handled by `reconcile`
 
 ## Querying on-demand (experimental)
 

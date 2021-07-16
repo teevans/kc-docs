@@ -1,7 +1,7 @@
-Integrating Azure Out of Cluster Cluster Costs into Kubecost
-============================================================
+Adding an Azure cloud integration with Kubecost
+===============================================
 
-Kubecost provides the ability to view Kubernetes metrics side-by-side with external cloud services cost, e.g. Azure Database Services. Additionally, it allows Kubecost to reconcile spend with your actual Azure bill. This gives teams running Kubernetes a complete and accurate picture of costs. [More info on this functionality](http://blog.kubecost.com/blog/complete-picture-when-monitoring-kubernetes-costs/)
+Connecting your Azure account to Kubecost allows you to view Kubernetes metrics side-by-side with external cloud services cost, e.g. Azure Database Services. Additionally, it allows Kubecost to reconcile measured Kubernetes spend with your actual Azure bill. This gives teams running Kubernetes a complete and accurate picture of costs. [More info on this functionality](http://blog.kubecost.com/blog/complete-picture-when-monitoring-kubernetes-costs/)
 
 To configure out-of-cluster (OOC) costs for Azure in Kubecost, you just need to set up daily exportation of cost reports to Azure storage. Once cost reports are exported to Azure Storage, Kubecost will access them through the Azure Storage API to display your OOC cost data alongside your in cluster costs.
 
@@ -21,9 +21,9 @@ The values needed to provide access to the Azure Storage Account where cost data
 * `<STORAGE_ACCOUNT_NAME>` is the name of the Storage account where the exported CSV is being stored.
 * `<STORE_ACCESS_KEY>` can be found by selecting the “Access Keys” option from the navigation sidebar  then selecting “Show Keys”. Using either of the two keys will work. 
 * `<REPORT_CONTAINER_NAME>` is the name that you choose for the exported cost report when you set it up. This is the name of the container where the CSV cost reports are saved in your Storage account. 
+With these value in hand you can now provide them to Kubecost to allow access to the Azure Storage API.
 
-
-### Maually add secret to cluster (Recommended)
+### Option #1: Maually add secret to cluster (Recommended)
 To create this secret you will need to create a JSON file that must be named azure-storage-config.json
 with the following format:
 
@@ -42,7 +42,7 @@ Once you have the values filled out use this command to create the secret:
 Once the secret is created, set `.Values.kubecostProductConfigs.azureStorageSecretName` to
 `<SECRET_NAME>` and upgrade Kubecost via Helm, other values related to Azure Storage (see other method) should not be set.
  
- ### Create a secret from helm values
+### Option #2: Create a secret from helm values
 
 * Set `.Values.kubecostProductConfigs.azureStorageAccount = <STORAGE_ACCOUNT_NAME>`
 * Set `.Values.kubecostProductConfigs.azureStorageAccessKey = <STORE_ACCESS_KEY>`

@@ -1,7 +1,10 @@
 AWS Cloud Integration
 =====================
 
-Kubecost pulls asset prices from the public AWS pricing API by default. To have accurate pricing information from AWS, you can integrate directly with your account. This integration will properly account for Enterprise Discount Programs, Reserved Instance usage, Savings Plans, spot usage and more. This resource describes the required steps for achieving this. 
+Kubecost pulls asset prices from the public AWS pricing API by default. To have accurate pricing information from AWS, you can integrate directly with your account. This integration will properly account for Enterprise Discount Programs, Reserved Instance usage, Savings Plans, spot usage and more. This resource describes the required steps for achieving this.
+
+Your user will need permissions necessary to create the Cost and Usage Report, add IAM credentials for Athena and S3. An optional permission is the ability to add and execute cloudformation templates. Note we do not require root access in the AWS account.
+
 
 # Cost and Usage Report Integration
 
@@ -376,9 +379,9 @@ These values can either be set from the kubecost frontend or via .Values.kubecos
     * The name of the bucket should match `s3://aws-athena-query-results-*`, so the IAM roles defined above will automatically allow access to it
     * The bucket can have a Canned ACL of `Private` or other permissions as you see fit.
 * `athenaRegion` The aws region athena is running in
-* `athenaDatabase` the name of the database created by the CUR setup
-    * The athena database name is available as the value (physical id) of `AWSCURDatabase` in the CloudFormation stack created above (in [Step 2: Setting up the CUR](#Step-2:-Setting-up-Athena))
-* `athenaTable` the name of the table created by the CUR setup
+* `athenaDatabase` the name of the database created by the Athena setup
+    * The athena database name is available as the value (physical id) of `AWSCURDatabase` in the CloudFormation stack created above (in [Step 2: Setting up Athena](#Step-2:-Setting-up-Athena))
+* `athenaTable` the name of the table created by the Athena setup
   * The table name is typically the database name with the leading `athenacurcfn_` removed (but is not available as a CloudFormation stack resource)
 
 > Make sure using only underscore as an delimiter if needed for tables and views, using dash will not work even though you might be able to create it see [docs](https://docs.aws.amazon.com/athena/latest/ug/tables-databases-columns-names.html).
@@ -428,3 +431,12 @@ These values can either be set from the kubecost frontend or via .Values.kubecos
  `spotLabel` optional kubernetes node label name designating whether a node is a spot node. Used to provide pricing estimates until exact spot data becomes available from the CUR
  
  `spotLabelValue` optional kubernetes node label value designating a spot node. Used to provide pricing estimates until exact spot data becomes available from the CUR. For example, if your spot nodes carry a label `lifecycle:spot`, then the spotLabel would be "lifecycle" and the spotLabelValue would be "spot"
+
+## Summary and Pricing
+AWS services used here are:
+  * [Athena](https://aws.amazon.com/athena/pricing/)
+  * [S3](https://aws.amazon.com/s3/pricing/)
+  * [EC2](https://aws.amazon.com/ec2/pricing/) Kubecost's cost-model requires roughly 2 CPU and 10GB of RAM per 50,000 pods monitored. The backing Prometheus database requires roughly 2CPU and 25GB per million metrics ingested per minute. You can pick the ec2 instances necessary to run kubecost accordingly.
+  * [EBS](https://aws.amazon.com/ebs/pricing/) Kubecost can write its cache to disk. Roughly 32 GB per 100,000 pods monitored is sufficient. (Optional-- our cache can exist in memory)
+  * [Cloudformation](https://aws.amazon.com/cloudformation/pricing/) (Optional-- manual IAM configuration or via Terraform is fine)
+  * [EKS](https://aws.amazon.com/eks/pricing/)  (Optional-- all k8s flavors are supported) 
