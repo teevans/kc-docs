@@ -1,6 +1,7 @@
 # Table of contents
 
 * [Add Key](README.md)
+  * [Alerts Subpage](readme/alerts-subpage.md)
 * [Advanced Reporting](advanced-reports.md)
 * [Installing Agent for Hosted Kubecost (Alpha)](agent.md)
 * [Installing in Air-gapped Environments](air-gapped.md)
